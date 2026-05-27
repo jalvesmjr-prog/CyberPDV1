@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CyberPDV - Produtos</title>
+  <link rel="shortcut icon" href="" id="dynamicFavicon">
+  <link rel="stylesheet" href="/css/style.css">
+  <script src="/js/theme.js"></script>
+  <style>
+    .table-wrap { overflow-x: auto; max-height: calc(100vh - 110px); overflow-y: auto; }
+    .table-wrap table { font-size: 12px; white-space: nowrap; width: 100%; table-layout: fixed; }
+    .table-wrap colgroup col { width: auto; }
+    .table-wrap th {
+      position: sticky; top: 0; z-index: 2; background: var(--bg-table-header); color: var(--text-table-header);
+      padding: 8px 6px; font-size: 12px; cursor: pointer; user-select: none;
+      overflow: hidden; text-overflow: ellipsis;
+    }
+    .table-wrap th:hover { background: var(--bg-topbar-hover); }
+    .table-wrap th .sort-icon { font-size: 10px; margin-left: 3px; }
+    .table-wrap th.sort-asc .sort-icon::after { content: '▲'; }
+    .table-wrap th.sort-desc .sort-icon::after { content: '▼'; }
+    .table-wrap td {
+      padding: 5px 6px; border-bottom: 1px solid var(--border-light);
+      overflow: hidden; text-overflow: ellipsis;
+    }
+    .table-wrap tr:hover { background: var(--bg-table-row-hover); }
+    .table-wrap tr.tipo-adm { background: var(--bg-row-adm); }
+    .table-wrap tr.tipo-adm:hover { background: var(--bg-row-adm-hover); }
+    .table-wrap tr.tipo-serv { background: var(--bg-row-serv); }
+    .table-wrap tr.tipo-serv:hover { background: var(--bg-row-serv-hover); }
+    .val-num { text-align: right; font-family: monospace; font-size: 12px; }
+    .val-center { text-align: center; }
+
+    .col-resize-handle {
+      position: absolute; right: -2px; top: 0; bottom: 0; width: 6px;
+      cursor: col-resize; z-index: 5; background: transparent;
+    }
+    .col-resize-handle:hover { background: rgba(255,255,255,0.35); }
+    .col-resize-handle.resizing { background: rgba(100,180,255,0.5); }
+    body.col-resizing { user-select: none !important; -webkit-user-select: none !important; }
+
+    .toolbar input, .toolbar select { padding: 7px 10px; border: 2px solid var(--border-default); border-radius: 5px; font-size: 13px; background: var(--bg-input); color: var(--text-primary); }
+    .toolbar input:focus { border-color: var(--border-focus); outline: none; }
+  </style>
+</head>
+<body>
+  <nav class="topbar">
+    <div class="topbar-left">
+      <strong>CyberPDV</strong> - Produtos <span style="font-weight:normal;font-size:12px;margin-left:8px;color:var(--text-light);">(db.xlsx)</span>
+    </div>
+    <div class="topbar-right">
+      <span id="userDisplay"></span>
+      <button class="btn btn-sm" onclick="location.href='/vendas.html'">Vendas</button>
+      <button class="btn btn-sm" onclick="location.href='/historico.html'">Histórico</button>
+      <button class="btn btn-sm" onclick="location.href='/relatorios.html'">Relatórios</button>
+      <button id="btnUsers" class="btn btn-sm" onclick="toggleUsuarios()" style="display:none">Usuários</button>
+      <button class="btn btn-sm" onclick="location.href='/config.html'">Config</button>
+      <button class="btn btn-sm btn-danger" onclick="logout()">Sair</button>
+    </div>
+  </nav>
+
+  <div class="container" style="max-width:100%;margin:8px 12px;padding:0;">
+    <div class="toolbar" style="margin-bottom:8px;flex-wrap:wrap;">
+      <button class="btn btn-primary btn-sm" onclick="novoProduto()">+ Novo</button>
+      <button class="btn btn-secondary btn-sm" onclick="importarDb()">Importar db.xlsx</button>
+      <span style="color:var(--text-muted);font-size:12px;margin-left:4px;" id="rowCount"></span>
+      <span style="flex:1"></span>
+      <select id="catFilterTable" onchange="carregarProdutos()" style="width:auto;">
+        <option value="">Todas categorias</option>
+      </select>
+      <input type="text" id="searchInput" placeholder="Buscar por sku, marca, modelo, nome..." oninput="carregarProdutos()" style="width:280px;">
+    </div>
+    <div class="table-wrap">
+      <table id="produtosTable">
+        <thead>
+          <tr>
+            <th data-col="acoes" style="min-width:110px;">AÇÕES</th>
+            <th data-col="sku" onclick="ordenar('sku')">SKU <span class="sort-icon"></span></th>
+            <th data-col="nome_completo" onclick="ordenar('nome_completo')">NOME COMPLETO <span class="sort-icon"></span></th>
+            <th data-col="tipo" onclick="ordenar('tipo')">TIPO <span class="sort-icon"></span></th>
+            <th data-col="categoria" onclick="ordenar('categoria')">CATEGORIA <span class="sort-icon"></span></th>
+            <th data-col="sub_categoria" onclick="ordenar('sub_categoria')">SUB CATEGORIA <span class="sort-icon"></span></th>
+            <th data-col="marca" onclick="ordenar('marca')">MARCA <span class="sort-icon"></span></th>
+            <th data-col="modelo" onclick="ordenar('modelo')">MODELO <span class="sort-icon"></span></th>
+            <th data-col="preco" onclick="ordenar('preco')" class="sort-num">PREÇO <span class="sort-icon"></span></th>
+            <th data-col="stock" onclick="ordenar('stock')" class="sort-num">ESTOQUE <span class="sort-icon"></span></th>
+            <th data-col="p" onclick="ordenar('p')" class="sort-num">P <span class="sort-icon"></span></th>
+            <th data-col="a" onclick="ordenar('a')" class="sort-num">A <span class="sort-icon"></span></th>
+            <th data-col="l" onclick="ordenar('l')" class="sort-num">L <span class="sort-icon"></span></th>
+            <th data-col="t" onclick="ordenar('t')" class="sort-num">T <span class="sort-icon"></span></th>
+            <th data-col="obs" onclick="ordenar('obs')">OBS <span class="sort-icon"></span></th>
+            <th data-col="img" onclick="ordenar('img')">IMG <span class="sort-icon"></span></th>
+            <th data-col="func" onclick="ordenar('func')">FUNC <span class="sort-icon"></span></th>
+            <th data-col="data" onclick="ordenar('data')">DATA <span class="sort-icon"></span></th>
+          </tr>
+        </thead>
+        <tbody id="produtosBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div id="modalProduto" class="modal" style="display:none">
+    <div class="modal-content" style="max-width:800px;">
+      <span class="modal-close" onclick="fecharModal()">&times;</span>
+      <h3 id="modalTitle">Produto</h3>
+      <form id="produtoForm">
+        <input type="hidden" id="prodSkuHidden">
+        <div class="form-row">
+          <div class="form-group" style="flex:0.4">
+            <label>SKU</label>
+            <input type="number" id="prodSku" min="0">
+          </div>
+          <div class="form-group" style="flex:0.3">
+            <label>TIPO</label>
+            <select id="prodTipo">
+              <option value="PROD">PROD</option>
+              <option value="SERV">SERV</option>
+              <option value="ADM">ADM</option>
+            </select>
+          </div>
+          <div class="form-group" style="flex:0.3">
+            <label>ESTOQUE</label>
+            <input type="number" id="prodStock" min="0">
+          </div>
+        </div>
+        <div class="form-group">
+          <label>NOME COMPLETO</label>
+          <input type="text" id="prodNome" placeholder="Nome completo do produto">
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>MARCA</label>
+            <input type="text" id="prodMarca">
+          </div>
+          <div class="form-group">
+            <label>MODELO</label>
+            <input type="text" id="prodModelo">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>CATEGORIA</label>
+            <select id="prodCategoria"></select>
+          </div>
+          <div class="form-group">
+            <label>SUB CATEGORIA</label>
+            <input type="text" id="prodSubcat">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group" style="flex:0.4">
+            <label>PREÇO (R$)</label>
+            <input type="number" id="prodPreco" step="0.01" min="0">
+          </div>
+          <div class="form-group" style="flex:0.2">
+            <label>P</label>
+            <input type="number" id="prodP" min="0" step="0.01">
+          </div>
+          <div class="form-group" style="flex:0.2">
+            <label>A</label>
+            <input type="number" id="prodA" min="0" step="0.01">
+          </div>
+          <div class="form-group" style="flex:0.2">
+            <label>L</label>
+            <input type="number" id="prodL" min="0" step="0.01">
+          </div>
+          <div class="form-group" style="flex:0.2">
+            <label>T</label>
+            <input type="number" id="prodT" min="0" step="0.01">
+          </div>
+        </div>
+        <div class="form-group">
+          <label>OBS</label>
+          <input type="text" id="prodObs">
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>IMG (URL)</label>
+            <input type="text" id="prodImg" placeholder="https://...">
+          </div>
+          <div class="form-group">
+            <label>FUNC</label>
+            <input type="text" id="prodFunc">
+          </div>
+          <div class="form-group">
+            <label>DATA</label>
+            <input type="date" id="prodData">
+          </div>
+        </div>
+        <button type="submit" class="btn btn-primary btn-full">Salvar</button>
+      </form>
+    </div>
+  </div>
+
+  <div id="modalUsuarios" class="modal" style="display:none">
+    <div class="modal-content" style="max-width:500px;">
+      <span class="modal-close" onclick="fecharModalUsuarios()">&times;</span>
+      <h3>Usuários</h3>
+      <div id="usuariosList"></div>
+      <hr>
+      <h4>Novo Usuário</h4>
+      <form id="usuarioForm">
+        <div class="form-group">
+          <label>Usuário</label>
+          <input type="text" id="newUsername" required>
+        </div>
+        <div class="form-group">
+          <label>Senha</label>
+          <input type="password" id="newPassword" required>
+        </div>
+        <div class="form-group">
+          <label>Nível</label>
+          <select id="newLevel">
+            <option value="vendedor">Vendedor</option>
+            <option value="gerente">Gerente</option>
+            <option value="adm">ADM</option>
+            <option value="lord">Lord</option>
+          </select>
+        </div>
+        <button type="submit" class="btn btn-primary btn-full">Criar</button>
+      </form>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/fuse.js@7.0.0/dist/fuse.min.js"></script>
+  <script src="/js/i18n.js"></script>
+  <script src="/js/ai-chat.js"></script>
+  <script src="/js/ai-assistant.js"></script>
+  <script src="/js/colresize.js"></script>
+  <script src="/js/produtos.js"></script>
+</body>
+</html>

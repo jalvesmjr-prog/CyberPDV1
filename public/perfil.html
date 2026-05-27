@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CyberPDV - Perfil</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <div class="top-bar">
+    <div class="logo">CyberPDV</div>
+    <nav>
+      <a href="vendas.html" class="nav-item">Vendas</a>
+      <a href="produtos.html" class="nav-item">Produtos</a>
+      <a href="historico.html" class="nav-item">Histórico</a>
+      <a href="relatorios.html" class="nav-item">Relatórios</a>
+      <a href="perfil.html" class="nav-item active">Perfil</a>
+    </nav>
+    <div class="user-info">
+      <span id="userNameDisplay"></span>
+      <button onclick="logout()">Sair</button>
+    </div>
+  </div>
+  <div class="content">
+    <div class="profile-card">
+      <h3>Informações do Usuário</h3>
+      <p><strong>Usuário:</strong> <span id="profileUsername"></span></p>
+      <p><strong>Nível:</strong> <span id="profileLevel"></span></p>
+    </div>
+    <div class="profile-card">
+      <h3>Alterar Senha</h3>
+      <form id="passwordForm" onsubmit="changePassword(event)">
+        <div class="form-group">
+          <label for="currentPassword">Senha Atual</label>
+          <input type="password" id="currentPassword" required>
+        </div>
+        <div class="form-group">
+          <label for="newPassword">Nova Senha</label>
+          <input type="password" id="newPassword" required>
+        </div>
+        <div class="form-group">
+          <label for="confirmPassword">Confirmar Nova Senha</label>
+          <input type="password" id="confirmPassword" required>
+        </div>
+        <div id="passwordError" class="error-message"></div>
+        <div id="passwordSuccess" class="success-message"></div>
+        <button type="submit" class="btn btn-primary">Alterar Senha</button>
+      </form>
+    </div>
+  </div>
+  <script>
+    var user = JSON.parse(localStorage.getItem('cyberpdv_user') || 'null');
+    if (!user) { window.location.href = 'index.html'; }
+    document.getElementById('userNameDisplay').textContent = user ? user.username : '';
+    document.getElementById('profileUsername').textContent = user ? user.username : '';
+    document.getElementById('profileLevel').textContent = user ? user.level : '';
+
+    function logout() { localStorage.removeItem('cyberpdv_user'); window.location.href = 'index.html'; }
+
+    function changePassword(e) {
+      e.preventDefault();
+      var errorEl = document.getElementById('passwordError');
+      var successEl = document.getElementById('passwordSuccess');
+      errorEl.textContent = '';
+      successEl.textContent = '';
+      var current = document.getElementById('currentPassword').value;
+      var newPass = document.getElementById('newPassword').value;
+      var confirm = document.getElementById('confirmPassword').value;
+      if (!current || !newPass || !confirm) {
+        errorEl.textContent = 'Preencha todos os campos.';
+        return;
+      }
+      if (newPass.length < 4) {
+        errorEl.textContent = 'A nova senha deve ter no mínimo 4 caracteres.';
+        return;
+      }
+      if (newPass !== confirm) {
+        errorEl.textContent = 'As senhas não conferem.';
+        return;
+      }
+      fetch('/auth/alterar-senha', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          usuario_id: user.id,
+          senha_atual: current,
+          nova_senha: newPass
+        })
+      })
+      .then(function(r) { return r.json(); })
+      .then(function(res) {
+        if (res.success) {
+          successEl.textContent = 'Senha alterada com sucesso!';
+          document.getElementById('currentPassword').value = '';
+          document.getElementById('newPassword').value = '';
+          document.getElementById('confirmPassword').value = '';
+        } else {
+          errorEl.textContent = res.message || 'Erro ao alterar senha.';
+        }
+      })
+      .catch(function() {
+        errorEl.textContent = 'Erro de conexão com o servidor.';
+      });
+    }
+  </script>
+</body>
+</html>

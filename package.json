@@ -1,0 +1,38 @@
+{
+  "name": "cyberpdv",
+  "version": "1.0.0",
+  "description": "Sistema de Vendas CyberPDV",
+  "main": "server.js",
+  "bin": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js",
+    "build": "pkg . --target node18-win-x64 --output dist/CyberPDV.exe",
+    "build:win": "npm run build && echo Build concluido: dist/CyberPDV.exe"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "pkg": {
+    "assets": [
+      "public/**/*",
+      "routes/**/*",
+      "node_modules/sql.js/dist/sql-wasm.wasm"
+    ],
+    "targets": [
+      "node18-win-x64"
+    ],
+    "outputPath": "dist"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.21.0",
+    "express-rate-limit": "^8.5.2",
+    "helmet": "^8.2.0",
+    "sql.js": "^1.10.0",
+    "xlsx": "^0.18.5"
+  },
+  "devDependencies": {
+    "pkg": "^5.8.1"
+  }
+}

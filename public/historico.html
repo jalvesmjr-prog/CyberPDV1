@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CyberPDV - Histórico de Vendas</title>
+  <link rel="shortcut icon" href="" id="dynamicFavicon">
+  <link rel="stylesheet" href="/css/style.css">
+  <script src="/js/theme.js"></script>
+</head>
+<body>
+  <nav class="topbar">
+    <div class="topbar-left">
+      <strong>CyberPDV</strong> - Histórico de Vendas
+    </div>
+    <div class="topbar-right">
+      <span id="userDisplay"></span>
+      <button class="btn btn-sm" onclick="location.href='/vendas.html'">Vendas</button>
+      <button class="btn btn-sm" onclick="location.href='/produtos.html'">Produtos</button>
+      <button class="btn btn-sm" onclick="location.href='/relatorios.html'">Relatórios</button>
+      <button class="btn btn-sm" onclick="location.href='/config.html'">Config</button>
+      <button class="btn btn-sm btn-danger" onclick="logout()">Sair</button>
+    </div>
+  </nav>
+
+  <div class="container">
+    <div class="toolbar" style="flex-wrap:wrap;">
+      <label style="font-size:13px;font-weight:600;">Filtros:</label>
+      <input type="date" id="filterStart" onchange="carregarVendas()" style="width:auto;padding:7px 10px;border:2px solid #ddd;border-radius:5px;">
+      <span style="color:#999;">até</span>
+      <input type="date" id="filterEnd" onchange="carregarVendas()" style="width:auto;padding:7px 10px;border:2px solid #ddd;border-radius:5px;">
+      <select id="filterPayment" onchange="carregarVendas()" style="width:auto;padding:7px 10px;border:2px solid #ddd;border-radius:5px;">
+        <option value="">Todas formas</option>
+        <option value="dinheiro">Dinheiro</option>
+        <option value="pix">PIX</option>
+        <option value="debito">Débito</option>
+        <option value="credito">Crédito</option>
+      </select>
+      <select id="filterUser" onchange="carregarVendas()" style="width:auto;padding:7px 10px;border:2px solid #ddd;border-radius:5px;">
+        <option value="">Todos usuários</option>
+      </select>
+      <span style="flex:1"></span>
+      <span id="salesCount" style="color:#999;font-size:13px;"></span>
+    </div>
+
+    <div id="vendasList"></div>
+  </div>
+
+  <div id="modalCupom" class="modal" style="display:none">
+    <div class="modal-content" style="max-width:380px;padding:20px;">
+      <span class="modal-close" onclick="this.parentElement.parentElement.style.display='none'">&times;</span>
+      <div id="cupomContent"></div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+  <script src="/js/i18n.js"></script>
+  <script src="/js/ai-chat.js"></script>
+  <script src="/js/ai-assistant.js"></script>
+  <script src="/js/historico.js"></script>
+</body>
+</html>

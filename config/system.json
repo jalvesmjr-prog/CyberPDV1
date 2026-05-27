@@ -1,0 +1,21 @@
+{
+  "theme": "light",
+  "language": "pt-BR",
+  "font_family": "system-ui",
+  "font_size": 14,
+  "coupon": {
+    "show_header": true,
+    "header_text": "CyberPDV - Sua Loja",
+    "show_logo": true,
+    "logo_url": "",
+    "footer_text": "Obrigado pela preferencia!",
+    "show_footer": true,
+    "show_observations": true
+  },
+  "system": {
+    "store_name": "CyberPDV",
+    "favicon_path": "",
+    "logo_path": ""
+  },
+  "font": "Courier New"
+}

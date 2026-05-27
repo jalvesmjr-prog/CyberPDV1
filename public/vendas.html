@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CyberPDV - Vendas</title>
+  <link rel="shortcut icon" href="" id="dynamicFavicon">
+  <link rel="stylesheet" href="/css/style.css">
+  <script src="/js/theme.js"></script>
+</head>
+<body>
+  <nav class="topbar">
+    <div class="topbar-left">
+      <strong>CyberPDV</strong> - Frente de Caixa
+    </div>
+    <div class="topbar-right">
+      <span id="userDisplay"></span>
+      <button class="btn btn-sm" onclick="location.href='/produtos.html'">Produtos</button>
+      <button class="btn btn-sm" onclick="location.href='/historico.html'">Histórico</button>
+      <button class="btn btn-sm" onclick="location.href='/relatorios.html'">Relatórios</button>
+      <button class="btn btn-sm" onclick="location.href='/config.html'">Config</button>
+      <button class="btn btn-sm btn-danger" onclick="logout()">Sair</button>
+    </div>
+  </nav>
+
+  <div class="vendas-layout">
+    <div class="vendas-left">
+      <div class="busca-produto">
+        <input type="text" id="searchProd" placeholder="Buscar produto por nome, marca ou código..." oninput="buscarProdutos()">
+        <select id="catFilter" onchange="buscarProdutos()">
+          <option value="">Todas as categorias</option>
+        </select>
+      </div>
+      <div class="codigo-barras">
+        <input type="text" id="barcodeInput" placeholder="Código de barras (escaneie ou digite)" onkeydown="handleBarcode(event)" autocomplete="off">
+        <button class="btn btn-sm btn-primary" onclick="buscarBarcode()" title="Buscar código">🔍</button>
+        <button class="btn btn-sm btn-success" id="btnCadastrarBarcode" onclick="abrirCadastroRapido()" style="display:none;" title="Cadastrar produto">+</button>
+      </div>
+      <div class="produtos-grid" id="produtosGrid"></div>
+    </div>
+
+    <div class="vendas-right">
+      <div class="carrinho-header">
+        <h3>Carrinho</h3>
+        <span id="itemCount">0 itens</span>
+      </div>
+      <div class="carrinho-body" id="carrinhoBody"></div>
+      <div class="carrinho-total">
+        <span>Total:</span>
+        <span id="totalCarrinho">R$ 0,00</span>
+      </div>
+      <div class="pagamento-group">
+        <label>Forma de Pagamento</label>
+        <div class="pagamento-botoes" id="pagamentoBotoes">
+          <button class="btn-pagamento active" data-method="dinheiro" onclick="selecionarPagamento('dinheiro')">💰 Dinheiro</button>
+          <button class="btn-pagamento" data-method="pix" onclick="selecionarPagamento('pix')">📱 PIX</button>
+          <button class="btn-pagamento" data-method="debito" onclick="selecionarPagamento('debito')">💳 Débito</button>
+          <button class="btn-pagamento" data-method="credito" onclick="selecionarPagamento('credito')">💳 Crédito</button>
+        </div>
+        <div class="troco-group" id="trocoGroup" style="display:none;">
+          <label>Valor Recebido (R$)</label>
+          <input type="number" id="valorRecebido" step="0.01" min="0" placeholder="0,00" oninput="calcularTroco()">
+          <div class="troco-display" id="trocoDisplay">
+            <span>Troco:</span>
+            <span id="trocoValor">R$ 0,00</span>
+          </div>
+        </div>
+        <button class="btn btn-success btn-full" onclick="finalizarVenda()" id="btnFinalizar">Finalizar Venda</button>
+        <button class="btn btn-secondary btn-full" onclick="limparCarrinho()">Limpar Carrinho</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="modalCupom" class="modal" style="display:none">
+    <div class="modal-content" style="max-width:380px;padding:20px;">
+      <span class="modal-close" onclick="this.parentElement.parentElement.style.display='none'">&times;</span>
+      <div id="cupomContent"></div>
+    </div>
+  </div>
+
+  <div id="modalCadastroRapido" class="modal" style="display:none">
+    <div class="modal-content modal-cadastro-rapido" style="max-width:450px;">
+      <span class="modal-close" onclick="fecharCadastroRapido()">&times;</span>
+      <h3 style="margin-bottom:16px;">Cadastro Rápido</h3>
+      <div id="cadastroRapidoForm">
+        <div class="form-group">
+          <label>Código (SKU)</label>
+          <input type="text" id="crSku" readonly style="background:var(--bg-input);font-weight:700;">
+        </div>
+        <div class="form-group">
+          <label>Nome do Produto</label>
+          <input type="text" id="crNome" placeholder="Ex: Fone Bluetooth XYZ" autocomplete="off">
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Preço (R$)</label>
+            <input type="number" id="crPreco" step="0.01" min="0" placeholder="0,00">
+          </div>
+          <div class="form-group">
+            <label>Tipo</label>
+            <select id="crTipo">
+              <option value="PROD">PROD</option>
+              <option value="SERV">SERV</option>
+              <option value="ADM">ADM</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Categoria</label>
+            <select id="crCategoria"></select>
+          </div>
+          <div class="form-group">
+            <label>Marca</label>
+            <input type="text" id="crMarca" placeholder="Ex: Philips" autocomplete="off">
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Modelo</label>
+          <input type="text" id="crModelo" placeholder="Ex: TH-123" autocomplete="off">
+        </div>
+        <div class="form-group">
+          <label>Estoque</label>
+          <input type="number" id="crEstoque" min="0" value="1">
+        </div>
+        <div id="crError" style="color:var(--text-error);font-size:13px;margin-bottom:10px;display:none;"></div>
+        <button class="btn btn-success btn-full" onclick="salvarCadastroRapido()" id="btnSalvarCr">Salvar e Adicionar ao Carrinho</button>
+        <button class="btn btn-secondary btn-full" onclick="fecharCadastroRapido()" style="margin-top:8px;">Cancelar</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/fuse.js@7.0.0/dist/fuse.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+  <script src="/js/i18n.js"></script>
+  <script src="/js/ai-chat.js"></script>
+  <script src="/js/ai-assistant.js"></script>
+  <script src="/js/vendas.js"></script>
+</body>
+</html>

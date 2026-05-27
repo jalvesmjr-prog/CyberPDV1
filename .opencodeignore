@@ -1,0 +1,6 @@
+database/cyberpdv.db
+node_modules/
+package-lock.json
+*.log
+*.bak
+*.tmp

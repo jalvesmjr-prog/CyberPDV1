@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title data-i18n="config">CyberPDV - Configuracoes</title>
+  <link rel="shortcut icon" href="" id="dynamicFavicon">
+  <link rel="stylesheet" href="/css/style.css">
+  <script src="/js/theme.js"></script>
+  <style>
+    .config-layout { display: flex; gap: 24px; max-width: 1000px; margin: 20px auto; padding: 0 20px; }
+    .config-sidebar { width: 220px; flex-shrink: 0; }
+    .config-sidebar .nav-item { display: block; padding: 10px 14px; margin-bottom: 4px; border-radius: 6px; cursor: pointer; font-size: 14px; color: var(--text-secondary); transition: background 0.2s; border: none; background: none; width: 100%; text-align: left; }
+    .config-sidebar .nav-item:hover { background: var(--bg-hover); }
+    .config-sidebar .nav-item.active { background: var(--color-accent); color: white; font-weight: 600; }
+    .config-content { flex: 1; }
+    .config-section { display: none; background: var(--bg-card); border-radius: 10px; padding: 24px; box-shadow: 0 1px 4px var(--shadow-card); }
+    .config-section.active { display: block; }
+    .config-section h2 { margin-bottom: 20px; font-size: 20px; color: var(--color-accent); }
+    .config-section .form-group { margin-bottom: 18px; }
+    .config-section .form-group label { display: block; margin-bottom: 6px; font-weight: 600; font-size: 13px; color: var(--text-secondary); }
+    .config-section .form-group input, .config-section .form-group select { width: 100%; padding: 10px 12px; border: 2px solid var(--border-default); border-radius: 6px; font-size: 14px; background: var(--bg-input); color: var(--text-primary); transition: border-color 0.2s; }
+    .config-section .form-group input:focus, .config-section .form-group select:focus { outline: none; border-color: var(--border-focus); }
+    .config-section .form-group input[type="file"] { padding: 8px; }
+    .config-section .form-row { display: flex; gap: 12px; }
+    .config-section .form-row .form-group { flex: 1; }
+    .theme-selector { display: flex; gap: 12px; margin-bottom: 16px; }
+    .theme-card { flex: 1; border: 3px solid var(--border-default); border-radius: 10px; padding: 20px 16px; text-align: center; cursor: pointer; transition: all 0.2s; background: var(--bg-secondary); }
+    .theme-card:hover { border-color: var(--color-accent); }
+    .theme-card.active { border-color: var(--color-accent); background: var(--bg-hover); }
+    .theme-card .theme-icon { font-size: 32px; margin-bottom: 8px; }
+    .theme-card .theme-label { font-size: 13px; font-weight: 600; color: var(--text-primary); }
+    .theme-card .theme-desc { font-size: 11px; color: var(--text-muted); margin-top: 4px; }
+    .logo-preview { max-width: 200px; max-height: 80px; border: 1px solid var(--border-light); border-radius: 4px; padding: 4px; background: var(--bg-secondary); margin-top: 8px; display: none; }
+    .logo-preview.show { display: block; }
+    .btn-upload { display: inline-flex; align-items: center; gap: 6px; }
+    .config-section .help-text { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
+    .config-footer { margin-top: 24px; display: flex; gap: 12px; }
+    .toast { position: fixed; bottom: 30px; right: 30px; padding: 14px 24px; border-radius: 8px; color: white; font-weight: 600; font-size: 14px; z-index: 9999; transform: translateY(100px); opacity: 0; transition: all 0.3s; }
+    .toast.show { transform: translateY(0); opacity: 1; }
+    .toast.success { background: var(--color-success); }
+    .toast.error { background: var(--color-danger); }
+    .toggle-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; }
+    .toggle-row label { font-weight: 600; font-size: 14px; color: var(--text-primary); }
+    .toggle { position: relative; width: 48px; height: 26px; cursor: pointer; }
+    .toggle input { display: none; }
+    .toggle .slider { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: var(--border-default); border-radius: 26px; transition: 0.3s; }
+    .toggle .slider::before { content: ''; position: absolute; width: 20px; height: 20px; border-radius: 50%; background: white; top: 3px; left: 3px; transition: 0.3s; }
+    .toggle input:checked + .slider { background: var(--color-accent); }
+    .toggle input:checked + .slider::before { transform: translateX(22px); }
+  </style>
+</head>
+<body>
+  <nav class="topbar">
+    <div class="topbar-left">
+      <strong data-i18n="app_name">CyberPDV</strong> - <span data-i18n="config">Configuracoes</span>
+    </div>
+    <div class="topbar-right">
+      <span id="userDisplay"></span>
+      <button class="btn btn-sm" onclick="location.href='/vendas.html'" data-i18n="vendas">Vendas</button>
+      <button class="btn btn-sm" onclick="location.href='/produtos.html'" data-i18n="produtos">Produtos</button>
+      <button class="btn btn-sm" onclick="location.href='/historico.html'" data-i18n="historico">Historico</button>
+      <button class="btn btn-sm" onclick="location.href='/relatorios.html'" data-i18n="relatorios">Relatorios</button>
+      <button class="btn btn-sm" onclick="location.href='/config.html'" data-i18n="config" style="background:var(--color-accent)">Config</button>
+      <button class="btn btn-sm btn-danger" onclick="logout()" data-i18n="logout">Sair</button>
+    </div>
+  </nav>
+
+  <div class="config-layout">
+    <div class="config-sidebar">
+      <button class="nav-item active" data-section="appearance" onclick="switchSection('appearance')"><span data-i18n="settings_appearance">Aparencia</span></button>
+      <button class="nav-item" data-section="language" onclick="switchSection('language')"><span data-i18n="settings_language">Idioma</span></button>
+      <button class="nav-item" data-section="font" onclick="switchSection('font')"><span data-i18n="settings_font">Fonte</span></button>
+      <button class="nav-item" data-section="coupon" onclick="switchSection('coupon')"><span data-i18n="settings_coupon">Cupom</span></button>
+      <button class="nav-item" data-section="system" onclick="switchSection('system')"><span data-i18n="settings_system">Sistema</span></button>
+      <button class="nav-item" data-section="account" onclick="switchSection('account')"><span data-i18n="settings_account">Meus Dados</span></button>
+    </div>
+
+    <div class="config-content">
+      <div id="section-appearance" class="config-section active">
+        <h2 data-i18n="settings_appearance">Aparencia</h2>
+        <div class="theme-selector">
+          <div class="theme-card" data-theme-value="light" onclick="selectTheme('light')">
+            <div class="theme-icon">☀️</div>
+            <div class="theme-label" data-i18n="theme_light">Claro</div>
+            <div class="theme-desc" data-i18n="theme_light">Claro</div>
+          </div>
+          <div class="theme-card" data-theme-value="dark" onclick="selectTheme('dark')">
+            <div class="theme-icon">🌙</div>
+            <div class="theme-label" data-i18n="theme_dark">Escuro</div>
+            <div class="theme-desc" data-i18n="theme_dark">Escuro</div>
+          </div>
+          <div class="theme-card" data-theme-value="system" onclick="selectTheme('system')">
+            <div class="theme-icon">💻</div>
+            <div class="theme-label" data-i18n="theme_system">Sistema</div>
+            <div class="theme-desc" data-i18n="theme_system">Sistema</div>
+          </div>
+        </div>
+      </div>
+
+      <div id="section-language" class="config-section">
+        <h2 data-i18n="settings_language">Idioma</h2>
+        <div class="form-group">
+          <label data-i18n="language">Idioma</label>
+          <select id="configLang" onchange="selectLanguage(this.value)">
+            <option value="pt-BR" data-i18n="language_pt">Portugues</option>
+            <option value="en" data-i18n="language_en">Ingles</option>
+          </select>
+        </div>
+      </div>
+
+      <div id="section-font" class="config-section">
+        <h2 data-i18n="settings_font">Fonte</h2>
+        <div class="form-row">
+          <div class="form-group">
+            <label data-i18n="font_family">Tipo da Fonte</label>
+            <select id="configFontFamily" onchange="applyFontPreview()">
+              <option value="system-ui, -apple-system, sans-serif" data-i18n="font_family_system">Padrao do Sistema</option>
+              <option value="'Segoe UI', Roboto, Arial, sans-serif" data-i18n="font_family_sans">Sem Serifa</option>
+              <option value="Georgia, 'Times New Roman', serif" data-i18n="font_family_serif">Com Serifa</option>
+              <option value="'Courier New', Consolas, monospace" data-i18n="font_family_mono">Monoespacada</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label data-i18n="font_size">Tamanho da Fonte</label>
+            <select id="configFontSize" onchange="applyFontPreview()">
+              <option value="12">12px - Pequeno</option>
+              <option value="13">13px</option>
+              <option value="14" selected>14px - Padrao</option>
+              <option value="15">15px</option>
+              <option value="16">16px - Grande</option>
+              <option value="18">18px - Extra Grande</option>
+            </select>
+          </div>
+        </div>
+        <div style="padding:16px;background:var(--bg-secondary);border-radius:6px;border:1px solid var(--border-default);margin-top:8px;">
+          <p data-i18n="preview" style="font-weight:600;margin-bottom:8px;">Visualizar:</p>
+          <p id="fontPreview" style="font-size:14px;font-family:system-ui;">
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit. 1234567890
+          </p>
+        </div>
+      </div>
+
+      <div id="section-coupon" class="config-section">
+        <h2 data-i18n="settings_coupon">Cupom</h2>
+        <div class="toggle-row">
+          <label data-i18n="coupon_header">Mostrar Cabecalho no Cupom</label>
+          <label class="toggle"><input type="checkbox" id="couponShowHeader" onchange="markDirty()"><span class="slider"></span></label>
+        </div>
+        <div class="form-group">
+          <label data-i18n="coupon_header_text">Texto do Cabecalho</label>
+          <input type="text" id="couponHeaderText" onchange="markDirty()">
+        </div>
+        <div class="toggle-row">
+          <label data-i18n="coupon_logo">Mostrar Logo no Cupom</label>
+          <label class="toggle"><input type="checkbox" id="couponShowLogo" onchange="markDirty()"><span class="slider"></span></label>
+        </div>
+        <div class="form-group">
+          <label data-i18n="coupon_footer">Texto do Rodape</label>
+          <input type="text" id="couponFooterText" onchange="markDirty()">
+        </div>
+      </div>
+
+      <div id="section-system" class="config-section">
+        <h2 data-i18n="settings_system">Sistema</h2>
+        <div class="form-group">
+          <label data-i18n="store_name">Nome da Loja</label>
+          <input type="text" id="systemStoreName" onchange="markDirty()">
+        </div>
+        <div class="form-group">
+          <label data-i18n="logo">Logo do Sistema</label>
+          <input type="file" id="logoUpload" accept="image/png,image/jpeg,image/gif" onchange="uploadFile('logo', this)">
+          <img id="logoPreview" class="logo-preview" alt="Preview Logo">
+          <button class="btn btn-sm btn-danger btn-upload" onclick="removeFile('logo')" style="margin-top:8px;display:none" id="logoRemoveBtn" data-i18n="remove">Remover</button>
+          <div class="help-text" data-i18n="upload">Formatos: PNG, JPG, GIF. Max 2MB.</div>
+        </div>
+        <div class="form-group">
+          <label data-i18n="favicon">Icone da Aba (Favicon)</label>
+          <input type="file" id="faviconUpload" accept="image/png,image/x-icon" onchange="uploadFile('favicon', this)">
+          <img id="faviconPreview" class="logo-preview" alt="Preview Favicon" style="max-width:48px;max-height:48px;">
+          <button class="btn btn-sm btn-danger btn-upload" onclick="removeFile('favicon')" style="margin-top:8px;display:none" id="faviconRemoveBtn" data-i18n="remove">Remover</button>
+          <div class="help-text" data-i18n="upload">Formatos: PNG, ICO. 32x32 recomendado.</div>
+        </div>
+      </div>
+
+      <div id="section-account" class="config-section">
+        <h2 data-i18n="settings_account">Meus Dados</h2>
+        <p style="margin-bottom:16px;color:var(--text-secondary);font-size:14px;" id="accountUserInfo"></p>
+        <hr style="border:none;border-top:1px solid var(--border-light);margin-bottom:20px;">
+        <h4 style="margin-bottom:16px;font-size:15px;color:var(--text-primary);" data-i18n="change_password">Alterar Senha</h4>
+        <form id="accountForm" onsubmit="return alterarSenha(event)">
+          <div class="form-group">
+            <label data-i18n="current_password">Senha Atual</label>
+            <input type="password" id="currentPassword" required placeholder="Digite sua senha atual">
+          </div>
+          <div class="form-group">
+            <label data-i18n="new_password">Nova Senha</label>
+            <input type="password" id="newPassword" required minlength="4" placeholder="Minimo 4 caracteres">
+          </div>
+          <div class="form-group">
+            <label data-i18n="confirm_password">Confirmar Nova Senha</label>
+            <input type="password" id="confirmPassword" required placeholder="Repita a nova senha">
+          </div>
+          <button type="submit" class="btn btn-primary" data-i18n="save_password">Alterar Senha</button>
+          <div id="accountMsg" class="config-msg" style="margin-top:10px;"></div>
+        </form>
+      </div>
+
+      <div class="config-footer">
+        <button class="btn btn-primary" onclick="saveConfig()" data-i18n="save">Salvar</button>
+        <button class="btn btn-secondary" onclick="loadConfig()" data-i18n="cancel">Cancelar</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast"></div>
+
+  <script src="/js/i18n.js"></script>
+  <script src="/js/ai-chat.js"></script>
+  <script src="/js/config.js"></script>
+</body>
+</html>

@@ -1,0 +1,58 @@
+{
+  "memory": {
+    "blocks": [
+      {
+        "path": ".opencode/memory/project.md",
+        "scope": "project",
+        "label": "Episodic memory — current state, progress, fixes",
+        "maxTokens": 2000
+      },
+      {
+        "path": ".opencode/memory/decisions.md",
+        "scope": "decisions",
+        "label": "Technical decision log with rationale",
+        "maxTokens": 2000
+      }
+    ]
+  },
+  "systemRules": [
+    "Always read AGENTS.md before starting any task",
+    "Read pre-task hooks in .opencode/hooks/pre-task.md before any implementation",
+    "Run post-task hooks in .opencode/hooks/post-task.md after any implementation",
+    "Update .opencode/memory/project.md with new changes after each session",
+    "Add new technical decisions to .opencode/memory/decisions.md with date and rationale",
+    "Never commit unless explicitly asked",
+    "Never add comments to code unless asked",
+    "Use Math.round(x * 100) / 100 for financial calculations",
+    "Server must use DB price/name, never trust client values",
+    "Use targeted file reads (line ranges) instead of full file reads when possible",
+    "One task per session — /clear between unrelated tasks",
+    "Keep sessions under 45 minutes or 40 turns — /clear after that",
+    "Monitor context: never exceed 40% of context window before compacting",
+    "If retrabalho > 30% (prompts corretivos / prompts totais), /clear and restart",
+    "Put critical instructions at START and END of prompt, not in the middle (Lost in the Middle principle)",
+    "Read hierarchical AGENTS.md if subdirectories have their own AGENTS.md"
+  ],
+  "hooks": {
+    "preTask": ".opencode/hooks/pre-task.md",
+    "postTask": ".opencode/hooks/post-task.md",
+    "preCommit": ".opencode/hooks/pre-commit.md"
+  },
+  "agents": {
+    "tester": {
+      "path": ".opencode/agents/tester.md",
+      "type": "explore",
+      "description": "Run tests against the running server"
+    },
+    "debugger": {
+      "path": ".opencode/agents/debugger.md",
+      "type": "explore",
+      "description": "Investigate bugs without modifying code"
+    },
+    "spec-reviewer": {
+      "path": ".opencode/agents/spec-reviewer.md",
+      "type": "general",
+      "description": "Review implementation against spec criteria"
+    }
+  }
+}

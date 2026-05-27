@@ -1,0 +1,66 @@
+╔══════════════════════════════════════════╗
+║         CyberPDV - INSTRUCOES            ║
+║    Sistema de Vendas Portatil v1.0       ║
+╚══════════════════════════════════════════╝
+
+--------------------------------------------------------
+  REQUISITOS
+--------------------------------------------------------
+- Windows 7/8/10/11 (64 bits)
+- Nenhum! O executavel ja tem tudo incluso.
+
+--------------------------------------------------------
+  INSTALACAO RAPIDA (USB / PASTA QUALQUER)
+--------------------------------------------------------
+1. Copie TODA a pasta CyberPDV para o local desejado
+2. (Opcional) Coloque o arquivo db.xlsx com seus produtos
+   na MESMA PASTA que CyberPDV.exe
+3. Execute INICIAR.bat (ou CyberPDV.exe diretamente)
+4. Abra o navegador em http://localhost:3000
+5. Login: lord / lord123
+
+--------------------------------------------------------
+  INSTALACAO COMPLETA (no PC)
+--------------------------------------------------------
+Execute INSTALAR.bat como Administrador (opcional).
+Ele vai:
+- Copiar os arquivos para %APPDATA%\CyberPDV
+- Criar atalho no Desktop
+- Criar atalho no Menu Iniciar
+- (Opcional) Iniciar o servidor
+
+--------------------------------------------------------
+  PRIMEIRO ACESSO
+--------------------------------------------------------
+Acesse http://localhost:3000
+
+Usuarios padrao:
+  Lord:     lord     / lord123
+  ADM:      adm      / adm123
+  Gerente:  gerente  / gerente123
+  Vendedor: vendedor / vendedor123
+
+--------------------------------------------------------
+  BANCO DE PRODUTOS (db.xlsx)
+--------------------------------------------------------
+Na primeira execucao, se existir um db.xlsx na mesma
+pasta que CyberPDV.exe, os produtos sao importados
+automaticamente.
+
+Se nao houver db.xlsx, o sistema inicia vazio.
+Para importar depois:
+  Acesse http://localhost:3000/produtos.html
+  Use o botao "Importar do Excel" se disponivel.
+
+Formato esperado do db.xlsx:
+  Linha 1: Cabecalho (ignorado)
+  Linha 2+: Dados
+  Colunas: A=(ignorada), B=SKU, C=NOME, D=PRECO,
+           E=TIPO, F=CATEGORIA, G=SUB CAT, H=MARCA,
+           I=MODELO, J=P, K=A, L=L, M=T, N=OBS,
+           O=IMG, P=FUNC, Q=DATA
+
+--------------------------------------------------------
+  SUPORTE
+--------------------------------------------------------
+Projeto: https://github.com/anomalyco/opencode

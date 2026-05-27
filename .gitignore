@@ -1,0 +1,15 @@
+node_modules/
+database/cyberpdv.db*
+dist/
+temp/
+_temp/
+uploads/
+prints/
+*.log
+*.bak
+*.tmp
+*.prn
+*.zip
+COM1
+USB001
+session-log-*.txt
