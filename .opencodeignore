@@ -1,5 +1,6 @@
 database/cyberpdv.db
 node_modules/
+jr/
 package-lock.json
 *.log
 *.bak

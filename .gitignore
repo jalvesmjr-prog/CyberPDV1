@@ -1,4 +1,5 @@
 node_modules/
+jr/
 database/cyberpdv.db*
 dist/
 temp/

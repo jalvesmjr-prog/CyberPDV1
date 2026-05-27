@@ -25,7 +25,7 @@ Write-Host "Destino: $bakDir" -ForegroundColor Yellow
 
 # --- 1. Backup com robocopy (rapido, ignora lixo) ---
 robocopy $projeto $bakDir /E `
-    /XD node_modules temp _temp dist .git `
+    /XD node_modules jr temp _temp dist .git `
     /XF "*.db" "*.db-wal" "*.db-shm" "*.prn" "*.log" "*.zip" "COM1" `
     /R:0 /W:0 /NFL /NDL /NJH /NJS
 
