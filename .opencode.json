@@ -1,4 +1,5 @@
 {
+  "$schema": "https://opencode.ai/config.json",
   "memory": {
     "blocks": [
       {
@@ -12,6 +13,12 @@
         "scope": "decisions",
         "label": "Technical decision log with rationale",
         "maxTokens": 2000
+      },
+      {
+        "path": ".opencode/memory/checkpoints.md",
+        "scope": "project",
+        "label": "Checkpoint history — backups and snapshots",
+        "maxTokens": 1000
       }
     ]
   },
@@ -54,5 +61,56 @@
       "type": "general",
       "description": "Review implementation against spec criteria"
     }
+  },
+  "commands": {
+    "start": {
+      "template": "Start the CyberPDV server on port 3000 using 'npm start' and confirm it's accessible at http://localhost:3000.",
+      "description": "Start the CyberPDV server"
+    },
+    "test": {
+      "template": "Execute all available API tests against the running server. Check each endpoint: login (lord/invalido), produtos (list/categorias/get/create), vendas (criar pix 400/estoque), relatorios, impressao, usuarios, perfil. Report PASS/FAIL for each.",
+      "description": "Run full test suite",
+      "agent": "tester"
+    },
+    "backup": {
+      "template": "Run .\\checkpoint.ps1 -Descricao \"[descricao do que foi feito]\" to create a backup and register in checkpoints.md.",
+      "description": "Create checkpoint backup"
+    },
+    "status": {
+      "template": "Read .opencode/memory/project.md and checkpoints.md. Then curl GET http://localhost:3000/api/produtos/1 to verify server is running. Report: server status, total products, last checkpoint, any blocked items.",
+      "description": "Show project status summary"
+    }
+  },
+  "instructions": [
+    "AGENTS.md",
+    "routes/AGENTS.md",
+    "public/AGENTS.md"
+  ],
+  "formatter": {
+    "prettier": {
+      "disabled": false
+    }
+  },
+  "lsp": true,
+  "permission": {
+    "edit": "allow",
+    "bash": "allow",
+    "write": "allow",
+    "read": "allow"
+  },
+  "compaction": {
+    "auto": true,
+    "prune": true,
+    "reserved": 10000
+  },
+  "watcher": {
+    "ignore": [
+      "node_modules/**",
+      ".git/**",
+      "jr/**",
+      "*.db",
+      "*.db-wal",
+      "*.db-shm"
+    ]
   }
 }
