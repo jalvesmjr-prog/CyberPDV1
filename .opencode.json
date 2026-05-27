@@ -98,6 +98,19 @@
     "write": "allow",
     "read": "allow"
   },
+  "mcp": {
+    "github": {
+      "type": "local",
+      "command": ["npx", "-y", "@modelcontextprotocol/server-github"],
+      "env": {
+        "GITHUB_TOKEN": "{env:GITHUB_TOKEN}"
+      }
+    },
+    "filesystem": {
+      "type": "local",
+      "command": ["npx", "-y", "@modelcontextprotocol/server-filesystem", "C:\\Users\\Jr\\Desktop\\CyberPDV1"]
+    }
+  },
   "compaction": {
     "auto": true,
     "prune": true,
